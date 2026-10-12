@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- The daemon never started on Windows ([@10kkyvl](https://github.com/10kkyvl)) [#6](https://github.com/tsanva/cc-discord-presence/pull/6)
+  - `start.ps1` sent stdout and stderr to the same file, which `Start-Process` refuses; stderr now goes to `~/.claude/discord-presence.log.err`
+  - `start.ps1` and `stop.ps1` trust the pid file only when that pid is a `cc-discord-presence` process, so a pid reused after a reboot no longer reports the daemon as running or gets force-stopped
+
+### Contributors
+- Yehor ([@10kkyvl](https://github.com/10kkyvl)) - Windows daemon start fix
+
 ## [1.0.5] - 2026-10-04
 
 ### Changed
