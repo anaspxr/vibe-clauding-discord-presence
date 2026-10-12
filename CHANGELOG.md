@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.6] - 2026-10-12
+
 ### Fixed
 - The daemon never started on Windows ([@10kkyvl](https://github.com/10kkyvl)) [#6](https://github.com/tsanva/cc-discord-presence/pull/6)
   - `start.ps1` sent stdout and stderr to the same file, which `Start-Process` refuses; stderr now goes to `~/.claude/discord-presence.log.err`
@@ -83,7 +85,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automatic binary download on first run
 - GitHub Actions workflow for automated releases
 
-[Unreleased]: https://github.com/tsanva/cc-discord-presence/compare/v1.0.3...HEAD
+[Unreleased]: https://github.com/tsanva/cc-discord-presence/compare/v1.0.6...HEAD
+[1.0.6]: https://github.com/tsanva/cc-discord-presence/compare/v1.0.5...v1.0.6
+[1.0.5]: https://github.com/tsanva/cc-discord-presence/compare/v1.0.4...v1.0.5
+[1.0.4]: https://github.com/tsanva/cc-discord-presence/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/tsanva/cc-discord-presence/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/tsanva/cc-discord-presence/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/tsanva/cc-discord-presence/compare/v1.0.0...v1.0.1
