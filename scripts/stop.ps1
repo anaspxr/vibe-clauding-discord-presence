@@ -26,7 +26,7 @@ Remove-Item $RefcountFile -Force -ErrorAction SilentlyContinue
 if (Test-Path $PidFile) {
     $ProcessId = Get-Content $PidFile -ErrorAction SilentlyContinue
     if ($ProcessId) {
-        $Process = Get-Process -Id $ProcessId -ErrorAction SilentlyContinue
+        $Process = Get-Process -Id $ProcessId -ErrorAction SilentlyContinue | Where-Object { $_.ProcessName -like "cc-discord-presence*" }
         if ($Process) {
             Stop-Process -Id $ProcessId -Force -ErrorAction SilentlyContinue
             Write-Host "Discord Rich Presence stopped (PID: $ProcessId)"

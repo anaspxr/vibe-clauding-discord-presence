@@ -35,7 +35,7 @@ $InstalledVersion = if (Test-Path $VersionFile) { (Get-Content $VersionFile -Raw
 if (Test-Path $PidFile) {
     $OldPid = Get-Content $PidFile -ErrorAction SilentlyContinue
     if ($OldPid) {
-        $Process = Get-Process -Id $OldPid -ErrorAction SilentlyContinue
+        $Process = Get-Process -Id $OldPid -ErrorAction SilentlyContinue | Where-Object { $_.ProcessName -like "cc-discord-presence*" }
         if ($Process) {
             if ($InstalledVersion -eq $Version) {
                 Write-Host "Discord Rich Presence already running (PID: $OldPid, sessions: $ActiveSessions)"
@@ -79,7 +79,7 @@ if (-not (Test-Path $Binary)) {
 }
 
 # Start the daemon in background
-$Process = Start-Process -FilePath $Binary -NoNewWindow -PassThru -RedirectStandardOutput $LogFile -RedirectStandardError $LogFile
+$Process = Start-Process -FilePath $Binary -NoNewWindow -PassThru -RedirectStandardOutput $LogFile -RedirectStandardError "$LogFile.err"
 $Process.Id | Out-File -FilePath $PidFile -Encoding ASCII
 
 Write-Host "Discord Rich Presence started (PID: $($Process.Id), sessions: $ActiveSessions)"
