@@ -713,12 +713,12 @@ func TestPresenceText(t *testing.T) {
 // TestPresenceTextConfig tests that the JSON config overrides the lines.
 func TestPresenceTextConfig(t *testing.T) {
 	configFilePath = filepath.Join(t.TempDir(), "config.json")
-	cfg := `{"details": "Token-Maxing {project}", "state": "{model} | {tokens}", "large_text": "on {branch}"}`
+	cfg := `{"details": "Token-Maxing {project}", "state": "{model} | {tokens}/{window} ({percent})", "large_text": "on {branch}"}`
 	if err := os.WriteFile(configFilePath, []byte(cfg), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	details, state, largeText := presenceText(&SessionData{ProjectName: "kadens", GitBranch: "main", ModelName: "Opus 5.5", TotalTokens: 54112})
-	if details != "Token-Maxing kadens" || state != "Opus 5.5 | 54.1K" || largeText != "on main" {
+	details, state, largeText := presenceText(&SessionData{ProjectName: "kadens", GitBranch: "main", ModelName: "Opus 5.5", TotalTokens: 54112, WindowSize: 1_000_000, UsedPercent: 5.4})
+	if details != "Token-Maxing kadens" || state != "Opus 5.5 | 54.1K/1.0M (5%)" || largeText != "on main" {
 		t.Errorf("got %q / %q / %q", details, state, largeText)
 	}
 

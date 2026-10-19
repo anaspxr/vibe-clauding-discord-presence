@@ -42,7 +42,11 @@ async function publish($: Engine) {
       total_duration_ms: now - usage.startedAt,
     },
     // Context size: the last request's input, cached tokens included.
-    context_window: { total_input_tokens: usage.context.tokens ?? 0 },
+    context_window: {
+      total_input_tokens: usage.context.tokens ?? 0,
+      context_window_size: usage.context.window,
+      used_percentage: usage.context.percent ?? 0,
+    },
   }
   await $.fs.write(path, JSON.stringify(data))
 }

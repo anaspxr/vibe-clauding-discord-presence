@@ -200,6 +200,8 @@ Both fields are optional. A field you leave out keeps the built-in text. Availab
 | `{branch}`  | Git branch (empty if the folder isn't a git repo)      |
 | `{model}`   | Model name                                             |
 | `{tokens}`  | Context size, e.g. `54.1K`                             |
+| `{window}`  | Model's context window, e.g. `1.0M` (hooks module or statusline only) |
+| `{percent}` | Context used, e.g. `15%` (hooks module or statusline only) |
 | `{cost}`    | Session cost, e.g. `$1.2700`                           |
 
 Add `"large_text"` to change the third line (also the app icon's hover text), with the same placeholders; `""` hides it.

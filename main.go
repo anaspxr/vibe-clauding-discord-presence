@@ -66,8 +66,10 @@ type StatusLineData struct {
 		TotalAPIDurationMS int64   `json:"total_api_duration_ms"`
 	} `json:"cost"`
 	ContextWindow struct {
-		TotalInputTokens  int64 `json:"total_input_tokens"`
-		TotalOutputTokens int64 `json:"total_output_tokens"`
+		TotalInputTokens  int64   `json:"total_input_tokens"`
+		TotalOutputTokens int64   `json:"total_output_tokens"`
+		ContextWindowSize int64   `json:"context_window_size"`
+		UsedPercentage    float64 `json:"used_percentage"`
 	} `json:"context_window"`
 }
 
@@ -78,6 +80,8 @@ type SessionData struct {
 	GitBranch   string
 	ModelName   string
 	TotalTokens int64
+	WindowSize  int64   // 0 when the source has none (JSONL)
+	UsedPercent float64 // of WindowSize
 	TotalCost   float64
 	StartTime   time.Time
 }
@@ -256,6 +260,8 @@ func readPresenceFile(path string) *SessionData {
 		ModelName:   statusLine.Model.DisplayName,
 		// Context size: the last request's input, cached tokens included.
 		TotalTokens: statusLine.ContextWindow.TotalInputTokens,
+		WindowSize:  statusLine.ContextWindow.ContextWindowSize,
+		UsedPercent: statusLine.ContextWindow.UsedPercentage,
 		TotalCost:   statusLine.Cost.TotalCostUSD,
 		StartTime:   sessionStartTime,
 	}
@@ -504,7 +510,7 @@ func setSource(source string) {
 
 // presenceConfig is ~/.claude/discord-presence-config.json. Every field is
 // optional; an empty one keeps the built-in text. Templates may use
-// {project} {branch} {model} {tokens} {cost}.
+// {project} {branch} {model} {tokens} {window} {percent} {cost}.
 type presenceConfig struct {
 	Details  string `json:"details"`
 	State    string `json:"state"`
@@ -545,6 +551,8 @@ func presenceText(session *SessionData) (details, state, largeText string) {
 		"{branch}", session.GitBranch,
 		"{model}", session.ModelName,
 		"{tokens}", formatNumber(session.TotalTokens),
+		"{window}", formatNumber(session.WindowSize),
+		"{percent}", fmt.Sprintf("%.0f%%", session.UsedPercent),
 		"{cost}", fmt.Sprintf("$%.4f", session.TotalCost),
 	)
 	if cfg.Details != "" {
