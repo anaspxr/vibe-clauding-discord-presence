@@ -5,7 +5,7 @@ Thank you for your interest in contributing! This document provides guidelines f
 ## Getting Started
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/cc-discord-presence.git`
+2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/vibe-clauding-discord-presence.git`
 3. Create a feature branch: `git checkout -b feature/your-feature-name`
 
 ## Development Setup

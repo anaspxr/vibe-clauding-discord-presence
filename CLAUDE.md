@@ -38,6 +38,7 @@ cc-discord-presence/
 ## Key Concepts
 
 ### Discord IPC Protocol
+
 - Unix socket at `/tmp/discord-ipc-{0-9}` (macOS/Linux)
 - Named pipe on Windows
 - Frame format: `[opcode:4 LE][length:4 LE][JSON payload]`
@@ -61,23 +62,26 @@ cc-discord-presence/
    - Finds most recently modified file (handles multiple instances)
 
 ### Plugin Hooks
+
 - **SessionStart**: Launches daemon via `scripts/start.sh`
 - **SessionEnd**: Stops daemon via `scripts/stop.sh`
 - Uses PID file at `~/.claude/discord-presence.pid`
 
 ### Session Tracking (Platform-specific)
+
 - **macOS/Linux**: PID-based tracking via files in `~/.claude/discord-presence-sessions/`
 - **Windows**: Refcount-based tracking via `~/.claude/discord-presence.refcount` (PPID unreliable on Windows)
 
 ### Model Pricing (Update when new models release)
+
 Located at top of `main.go` in `modelPricing` and `modelDisplayNames` maps.
 
-| Model | Input $/1M | Output $/1M |
-|-------|-----------|-------------|
-| Opus 4.5 | $15 | $75 |
-| Sonnet 4.5 | $3 | $15 |
-| Sonnet 4 | $3 | $15 |
-| Haiku 4.5 | $1 | $5 |
+| Model      | Input $/1M | Output $/1M |
+| ---------- | ---------- | ----------- |
+| Opus 4.5   | $15        | $75         |
+| Sonnet 4.5 | $3         | $15         |
+| Sonnet 4   | $3         | $15         |
+| Haiku 4.5  | $1         | $5          |
 
 ## Development Commands
 
@@ -91,13 +95,15 @@ go test -v ./...                     # Run all tests
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. Key points:
+
 - Run `go test -v ./...` before submitting PRs
 - Update CHANGELOG.md with your changes
 - Contributors are credited in release notes
 
 ## Configuration
 
-- Client ID `1455326944060248250` is hardcoded (shared "Clawd Code" Discord app)
+- Client ID `1561708884283105392` is hardcoded (the "Vibe Clauding" Discord app; upstream uses its own "Clawd Code" app)
+- Status text is customizable via `~/.claude/discord-presence-config.json` (`details`, `state`; see `presenceText` in `main.go` and the README)
 - App icon set in Discord Developer Portal (used automatically for Rich Presence)
 
 ## Important Notes
@@ -123,12 +129,15 @@ Users get a new plugin version from `main`, and the start scripts on `main` poin
    - `.claude-plugin/marketplace.json` - `"version": "X.X.X"`
 
 2. **Tag the PR's head commit** (rebased on current `main`) and push the tag:
+
    ```bash
    git tag -a vX.X.X -m "vX.X.X" && git push origin vX.X.X
    ```
+
    The Release workflow (`.github/workflows/release.yml`) checks that all four versions match the tag, runs the tests, builds all binaries and creates the GitHub release. If it fails, nothing has reached users: fix, delete the tag and release, retag.
 
 3. **After the release succeeds, fast-forward `main`** to the tagged commit (GitHub marks the PR merged):
+
    ```bash
    git push origin vX.X.X^{commit}:main
    ```

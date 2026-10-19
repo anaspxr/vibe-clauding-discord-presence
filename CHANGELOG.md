@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-19
+
+### Fork notice
+- This is a fork of [tsanva/cc-discord-presence](https://github.com/tsanva/cc-discord-presence). Entries for 1.0.6 and earlier are the upstream history, and their links point to the upstream repo. This fork continues the numbering from upstream 1.0.6.
+
+### Added
+- Customizable status text through `~/.claude/discord-presence-config.json`, with `{project}`, `{branch}`, `{model}`, `{tokens}` and `{cost}` placeholders
+
+### Changed
+- Own Discord application ("Vibe Clauding") instead of the shared "Clawd Code" one
+- Renamed the plugin to `vibe-clauding-discord-presence` and the start scripts now download binaries from this fork's releases
+- Discord's reply to a presence update is now checked, so a rejected update is reported instead of failing silently
+
 ## [1.0.6] - 2026-10-12
 
 ### Fixed
@@ -85,7 +98,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automatic binary download on first run
 - GitHub Actions workflow for automated releases
 
-[Unreleased]: https://github.com/tsanva/cc-discord-presence/compare/v1.0.6...HEAD
+[Unreleased]: https://github.com/anaspxr/vibe-clauding-discord-presence/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/anaspxr/vibe-clauding-discord-presence/releases/tag/v1.1.0
 [1.0.6]: https://github.com/tsanva/cc-discord-presence/compare/v1.0.5...v1.0.6
 [1.0.5]: https://github.com/tsanva/cc-discord-presence/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/tsanva/cc-discord-presence/compare/v1.0.3...v1.0.4

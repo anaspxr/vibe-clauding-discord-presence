@@ -1,19 +1,21 @@
-# Clawd Code - Discord Rich Presence for Claude Code
+# Vibe Clauding - Discord Rich Presence for Claude Code
 
 Show your Claude Code session on Discord! Display your current project, git branch, model, session time, token usage, and cost in real-time.
 
+> **This is a fork of [tsanva/cc-discord-presence](https://github.com/tsanva/cc-discord-presence)** by [Vasant Paradissa Nuno Sakti](https://github.com/tsanva), released under the same MIT license. All the session tracking and Discord integration is their work. This fork adds [customizable status text](#customizing-the-status-text) and runs under its own Discord app. If you want the original, go to the [upstream repo](https://github.com/tsanva/cc-discord-presence).
+
 ## Platform Support
 
-| Platform | Status |
-|----------|--------|
-| macOS (Apple Silicon) | ✅ Tested |
-| macOS (Intel) | ⚠️ Untested |
-| Linux (x64) | ⚠️ Untested |
-| Linux (ARM64) | ⚠️ Untested |
-| Windows (x64) | ✅ Tested |
-| Windows (ARM64) | ⚠️ Untested |
+| Platform              | Status      |
+| --------------------- | ----------- |
+| macOS (Apple Silicon) | ✅ Tested   |
+| macOS (Intel)         | ⚠️ Untested |
+| Linux (x64)           | ⚠️ Untested |
+| Linux (ARM64)         | ⚠️ Untested |
+| Windows (x64)         | ✅ Tested   |
+| Windows (ARM64)       | ⚠️ Untested |
 
-> **Note**: macOS Intel and Linux should work but haven't been verified. Please [report problems](https://github.com/tsanva/cc-discord-presence/issues).
+> **Note**: macOS Intel and Linux should work but haven't been verified. Please [report problems](https://github.com/anaspxr/vibe-clauding-discord-presence/issues). For problems that also happen in the original, [upstream](https://github.com/tsanva/cc-discord-presence/issues) may know more.
 >
 > **Windows users**: Requires [Git Bash](https://git-scm.com/downloads) (included with Git for Windows) for automatic plugin hooks. Alternatively, run the PowerShell scripts manually (`scripts/start.ps1` and `scripts/stop.ps1`). WSL won't work as Discord runs on the Windows host.
 
@@ -25,6 +27,7 @@ Show your Claude Code session on Discord! Display your current project, git bran
 - **Model Name** - Shows which Claude model you're using (Opus 4.5, Sonnet 4.5, Haiku 4.5)
 - **Context Size** - Tokens in Claude's context window right now (cached tokens included)
 - **Total Cost** - Real-time cost tracking for your session
+- **Custom Status Text** - Change what Discord shows with a small JSON file (this fork's addition)
 
 ## Installation
 
@@ -32,10 +35,10 @@ Show your Claude Code session on Discord! Display your current project, git bran
 
 ```bash
 # Add the marketplace
-claude plugin marketplace add tsanva/cc-discord-presence
+claude plugin marketplace add anaspxr/vibe-clauding-discord-presence
 
 # Install the plugin
-claude plugin install cc-discord-presence@cc-discord-presence
+claude plugin install vibe-clauding-discord-presence@vibe-clauding-discord-presence
 ```
 
 That's it! The plugin will automatically start when you begin a Claude Code session and stop when you exit.
@@ -43,8 +46,8 @@ That's it! The plugin will automatically start when you begin a Claude Code sess
 ### Updating
 
 ```bash
-claude plugin marketplace update cc-discord-presence
-claude plugin update cc-discord-presence@cc-discord-presence
+claude plugin marketplace update vibe-clauding-discord-presence
+claude plugin update vibe-clauding-discord-presence@vibe-clauding-discord-presence
 ```
 
 Then start a new Claude Code session. The plugin's start script notices that the daemon in `~/.claude/bin/` is from an older release, stops it, downloads the matching one and starts it.
@@ -55,8 +58,8 @@ Then start a new Claude Code session. The plugin's start script notices that the
 
 ```bash
 # Clone and build
-git clone https://github.com/tsanva/cc-discord-presence.git
-cd cc-discord-presence
+git clone https://github.com/anaspxr/vibe-clauding-discord-presence.git
+cd vibe-clauding-discord-presence
 go build -o cc-discord-presence .
 
 # Run manually
@@ -80,6 +83,7 @@ On Claude Code versions without hooks modules, you can configure the statusline 
 As a last resort, the app parses Claude Code's session files from `~/.claude/projects/`. Cost is estimated from the model pricing table.
 
 <a name="statusline-setup"></a>
+
 #### Statusline Setup (Optional)
 
 Only needed on Claude Code versions without hooks module support.
@@ -87,22 +91,26 @@ Only needed on Claude Code versions without hooks module support.
 **Automatic Setup (Recommended)**:
 
 Run the setup script (requires `jq`):
+
 ```bash
 # Find your plugin directory and run setup
-~/.claude/plugins/cache/*/cc-discord-presence/*/scripts/setup-statusline.sh
+~/.claude/plugins/cache/*/vibe-clauding-discord-presence/*/scripts/setup-statusline.sh
 ```
 
 Or if you have the repo cloned:
+
 ```bash
 ./scripts/setup-statusline.sh
 ```
 
 The setup script will:
+
 - Copy `statusline-wrapper.sh` to `~/.claude/`
 - Update your `~/.claude/settings.json` automatically
 - Back up any existing statusline to `~/.claude/statusline.sh`
 
 **Manual Setup**: If you prefer, edit `~/.claude/settings.json`:
+
 ```json
 {
   "statusLine": {
@@ -119,11 +127,13 @@ Then copy `scripts/statusline-wrapper.sh` to `~/.claude/statusline-wrapper.sh`.
 #### Verifying Your Setup
 
 Check which data source is being used by viewing the daemon log:
+
 ```bash
 cat ~/.claude/discord-presence.log
 ```
 
 You'll see one of:
+
 - `✓ Found active session: project-name (using hooks module)` - Best accuracy, no setup
 - `✓ Found active session: project-name (using statusline data)` - Same accuracy, for older Claude Code versions
 - `✓ Found active session: project-name (using JSONL fallback)` - Working, but cost is estimated; update Claude Code or set up the statusline
@@ -132,7 +142,7 @@ You'll see one of:
 
 ```
 ┌─────────────────────────────────┐
-│ Clawd Code                      │
+│ Vibe Clauding                      │
 │ Working on: my-project (main)   │
 │ Opus 4.5 | 1.5M tokens | $0.1234│
 │ 00:45:30 elapsed                │
@@ -164,16 +174,39 @@ GOOS=windows GOARCH=amd64 go build -o bin/cc-discord-presence-windows-amd64.exe 
 
 Cost is calculated using current Claude API pricing (Dec 2025):
 
-| Model | Input (per 1M tokens) | Output (per 1M tokens) |
-|-------|----------------------|------------------------|
-| Opus 4.5 | $15.00 | $75.00 |
-| Sonnet 4.5 | $3.00 | $15.00 |
-| Sonnet 4 | $3.00 | $15.00 |
-| Haiku 4.5 | $1.00 | $5.00 |
+| Model      | Input (per 1M tokens) | Output (per 1M tokens) |
+| ---------- | --------------------- | ---------------------- |
+| Opus 4.5   | $15.00                | $75.00                 |
+| Sonnet 4.5 | $3.00                 | $15.00                 |
+| Sonnet 4   | $3.00                 | $15.00                 |
+| Haiku 4.5  | $1.00                 | $5.00                  |
+
+## Customizing the Status Text
+
+Discord shows two text lines under the app name: `details` (top) and `state` (bottom). Create `~/.claude/discord-presence-config.json` to change them:
+
+```json
+{
+  "details": "Token-Maxing🔥 {model} | {tokens} tokens",
+  "state": "{project}"
+}
+```
+
+Both fields are optional. A field you leave out keeps the built-in text. Available placeholders:
+
+| Placeholder | Value                                                  |
+| ----------- | ------------------------------------------------------ |
+| `{project}` | Project folder name                                    |
+| `{branch}`  | Git branch (empty if the folder isn't a git repo)      |
+| `{model}`   | Model name                                             |
+| `{tokens}`  | Context size, e.g. `54.1K`                             |
+| `{cost}`    | Session cost, e.g. `$1.2700`                           |
+
+The file is re-read every few seconds, so edits show up without restarting. If the file is missing or isn't valid JSON, the defaults are used. Discord cuts off long lines, so keep them short. [discord-presence-config.example.json](discord-presence-config.example.json) is a ready-to-copy example.
 
 ## Advanced: Custom Discord App
 
-By default, this uses a shared Discord application ("Clawd Code"). If you want to use your own:
+This fork uses its own Discord application ("Vibe Clauding"). If you want your own name and icon:
 
 1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
 2. Click "New Application" and name it
@@ -187,7 +220,7 @@ By default, this uses a shared Discord application ("Clawd Code"). If you want t
 ### Plugin Removal
 
 ```bash
-claude plugin uninstall cc-discord-presence@cc-discord-presence
+claude plugin uninstall vibe-clauding-discord-presence@vibe-clauding-discord-presence
 ```
 
 ### Statusline Cleanup (if configured)
@@ -223,6 +256,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 **Before submitting a PR**, make sure to run the test suite:
+
 ```bash
 go test -v ./...
 ```
