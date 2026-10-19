@@ -102,7 +102,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. Key points:
 
 ## Configuration
 
-- Client ID `1561708884283105392` is hardcoded (the "Vibe Clauding" Discord app; upstream uses its own "Clawd Code" app)
+- Client ID `1561799669942583428` is hardcoded (the "Vibe Clauding" Discord app; upstream uses its own "Clawd Code" app)
 - Status text is customizable via `~/.claude/discord-presence-config.json` (`details`, `state`; see `presenceText` in `main.go` and the README)
 - App icon set in Discord Developer Portal (used automatically for Rich Presence)
 

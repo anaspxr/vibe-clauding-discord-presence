@@ -21,7 +21,7 @@ import (
 
 const (
 	// Discord Application ID for "Vibe Clauding"
-	ClientID = "1561708884283105392"
+	ClientID = "1561799669942583428"
 
 	// Polling interval as fallback
 	PollInterval = 3 * time.Second
