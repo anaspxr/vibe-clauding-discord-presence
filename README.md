@@ -2,7 +2,7 @@
 
 Show your Claude Code session on Discord! Display your current project, git branch, model, session time, token usage, and cost in real-time.
 
-> **This is a fork of [tsanva/cc-discord-presence](https://github.com/tsanva/cc-discord-presence)** by [Vasant Paradissa Nuno Sakti](https://github.com/tsanva), released under the same MIT license. All the session tracking and Discord integration is their work. This fork adds [customizable status text](#customizing-the-status-text) and runs under its own Discord app. If you want the original, go to the [upstream repo](https://github.com/tsanva/cc-discord-presence).
+> **This is a fork of [tsanva/cc-discord-presence](https://github.com/tsanva/cc-discord-presence)** by [@tsanva](https://github.com/tsanva), released under the same MIT license. All the session tracking and Discord integration is their work. This fork adds [customizable status text](#customizing-the-status-text) and runs under its own Discord app. If you want the original, go to the [upstream repo](https://github.com/tsanva/cc-discord-presence).
 
 ## Platform Support
 
