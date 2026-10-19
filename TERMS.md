@@ -46,4 +46,4 @@ This software is released under the MIT License. See [LICENSE](LICENSE) for the 
 ## Contact
 
 For questions about these terms, please open an issue on the GitHub repository:
-https://github.com/tsanva/cc-discord-presence
+https://github.com/anaspxr/vibe-clauding-discord-presence

@@ -38,7 +38,7 @@ This application uses Discord's Rich Presence feature via local IPC. Your presen
 ## Open Source
 
 This application is fully open source. You can audit the code at:
-https://github.com/tsanva/cc-discord-presence
+https://github.com/anaspxr/vibe-clauding-discord-presence
 
 ## Contact
 
