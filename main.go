@@ -509,6 +509,8 @@ type presenceConfig struct {
 	Details  string `json:"details"`
 	State    string `json:"state"`
 	Activity string `json:"activity"` // a key of activityTypes; "playing" otherwise
+	// The third line (Discord's image text). A pointer so "" can hide it.
+	LargeText *string `json:"large_text"`
 }
 
 // activityTypes are the Discord activity types RPC accepts, by the word
@@ -524,8 +526,8 @@ func loadConfig() presenceConfig {
 	return cfg
 }
 
-// presenceText builds the two activity lines Discord shows.
-func presenceText(session *SessionData) (details, state string) {
+// presenceText builds the three activity lines Discord shows.
+func presenceText(session *SessionData) (details, state, largeText string) {
 	details = fmt.Sprintf("Working on: %s", session.ProjectName)
 	if session.GitBranch != "" {
 		details = fmt.Sprintf("Working on: %s (%s)", session.ProjectName, session.GitBranch)
@@ -551,11 +553,15 @@ func presenceText(session *SessionData) (details, state string) {
 	if cfg.State != "" {
 		state = fill.Replace(cfg.State)
 	}
-	return details, state
+	largeText = "Vibe Clauding - Discord Rich Presence for Claude Code"
+	if cfg.LargeText != nil {
+		largeText = fill.Replace(*cfg.LargeText)
+	}
+	return details, state, largeText
 }
 
 func updatePresence(session *SessionData) {
-	details, state := presenceText(session)
+	details, state, largeText := presenceText(session)
 	activityType := activityTypes[strings.ToLower(loadConfig().Activity)]
 
 	// The data files change often (the hooks module writes after every tool
@@ -569,7 +575,7 @@ func updatePresence(session *SessionData) {
 	if err := discordClient.SetActivity(discord.Activity{
 		Details:   details,
 		State:     state,
-		LargeText: "Vibe Clauding - Discord Rich Presence for Claude Code",
+		LargeText: largeText,
 		StartTime: &session.StartTime,
 		Type:      activityType,
 	}); err != nil {

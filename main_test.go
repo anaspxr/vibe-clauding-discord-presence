@@ -692,7 +692,7 @@ func TestReadSessionDataPriority(t *testing.T) {
 // TestPresenceText tests the activity lines Discord shows.
 func TestPresenceText(t *testing.T) {
 	configFilePath = filepath.Join(t.TempDir(), "missing.json")
-	details, state := presenceText(&SessionData{
+	details, state, largeText := presenceText(&SessionData{
 		ProjectName: "kadens",
 		GitBranch:   "main",
 		ModelName:   "Opus 5.5",
@@ -705,17 +705,26 @@ func TestPresenceText(t *testing.T) {
 	if state != "Opus 5.5 | 54.1K tokens | $1.2700" {
 		t.Errorf("state = %q", state)
 	}
+	if largeText != "Vibe Clauding - Discord Rich Presence for Claude Code" {
+		t.Errorf("largeText = %q", largeText)
+	}
 }
 
 // TestPresenceTextConfig tests that the JSON config overrides the lines.
 func TestPresenceTextConfig(t *testing.T) {
 	configFilePath = filepath.Join(t.TempDir(), "config.json")
-	cfg := `{"details": "Token-Maxing {project}", "state": "{model} | {tokens}"}`
+	cfg := `{"details": "Token-Maxing {project}", "state": "{model} | {tokens}", "large_text": "on {branch}"}`
 	if err := os.WriteFile(configFilePath, []byte(cfg), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	details, state := presenceText(&SessionData{ProjectName: "kadens", ModelName: "Opus 5.5", TotalTokens: 54112})
-	if details != "Token-Maxing kadens" || state != "Opus 5.5 | 54.1K" {
-		t.Errorf("got %q / %q", details, state)
+	details, state, largeText := presenceText(&SessionData{ProjectName: "kadens", GitBranch: "main", ModelName: "Opus 5.5", TotalTokens: 54112})
+	if details != "Token-Maxing kadens" || state != "Opus 5.5 | 54.1K" || largeText != "on main" {
+		t.Errorf("got %q / %q / %q", details, state, largeText)
+	}
+
+	// An empty large_text hides the third line.
+	os.WriteFile(configFilePath, []byte(`{"large_text": ""}`), 0o644)
+	if _, _, largeText := presenceText(&SessionData{}); largeText != "" {
+		t.Errorf("largeText = %q, want empty", largeText)
 	}
 }
