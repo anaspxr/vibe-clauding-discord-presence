@@ -19,8 +19,8 @@ import (
 )
 
 const (
-	// Discord Application ID for "Clawd Code"
-	ClientID = "1455326944060248250"
+	// Discord Application ID for "Vibe Clauding"
+	ClientID = "1561708884283105392"
 
 	// Polling interval as fallback
 	PollInterval = 3 * time.Second
@@ -99,6 +99,7 @@ var (
 	projectsDir      string
 	dataFilePath     string
 	moduleFilePath   string
+	configFilePath   string
 	sessionStartTime = time.Now()
 	discordClient    *discord.Client
 	currentSource    string
@@ -123,12 +124,13 @@ func init() {
 	projectsDir = filepath.Join(claudeDir, "projects")
 	dataFilePath = filepath.Join(claudeDir, "discord-presence-data.json")
 	moduleFilePath = filepath.Join(claudeDir, "discord-presence-module.json")
+	configFilePath = filepath.Join(claudeDir, "discord-presence-config.json")
 }
 
 func main() {
 	fmt.Println(`
 ╔═══════════════════════════════════════════════════════════╗
-║     Clawd Code - Discord Rich Presence                    ║
+║     Vibe Clauding - Discord Rich Presence                 ║
 ║     Show your Claude Code session on Discord!             ║
 ╚═══════════════════════════════════════════════════════════╝`)
 
@@ -441,7 +443,7 @@ func readSessionData() *SessionData {
 		nudgeShown = true
 		fmt.Println("\n💡 Tip: For accurate token/cost data, update Claude Code (the plugin's hooks module")
 		fmt.Println("   needs a recent version) or configure the statusline wrapper.")
-		fmt.Println("   See: https://github.com/tsanva/cc-discord-presence#statusline-setup")
+		fmt.Println("   See: https://github.com/anaspxr/vibe-clauding-discord-presence#statusline-setup")
 	}
 
 	return parseJSONLSession(jsonlPath, projectPath)
@@ -453,6 +455,23 @@ func setSource(source string) {
 		fmt.Printf("📊 Now using %s\n", source)
 	}
 	currentSource = source
+}
+
+// presenceConfig is ~/.claude/discord-presence-config.json. Every field is
+// optional; an empty one keeps the built-in text. Templates may use
+// {project} {branch} {model} {tokens} {cost}.
+type presenceConfig struct {
+	Details string `json:"details"`
+	State   string `json:"state"`
+}
+
+// loadConfig is read on every update, so edits apply without a restart.
+func loadConfig() presenceConfig {
+	var cfg presenceConfig
+	if data, err := os.ReadFile(configFilePath); err == nil {
+		json.Unmarshal(data, &cfg) // bad JSON keeps the defaults
+	}
+	return cfg
 }
 
 // presenceText builds the two activity lines Discord shows.
@@ -467,6 +486,21 @@ func presenceText(session *SessionData) (details, state string) {
 		session.ModelName,
 		formatNumber(session.TotalTokens),
 		session.TotalCost)
+
+	cfg := loadConfig()
+	fill := strings.NewReplacer(
+		"{project}", session.ProjectName,
+		"{branch}", session.GitBranch,
+		"{model}", session.ModelName,
+		"{tokens}", formatNumber(session.TotalTokens),
+		"{cost}", fmt.Sprintf("$%.4f", session.TotalCost),
+	)
+	if cfg.Details != "" {
+		details = fill.Replace(cfg.Details)
+	}
+	if cfg.State != "" {
+		state = fill.Replace(cfg.State)
+	}
 	return details, state
 }
 
@@ -484,7 +518,7 @@ func updatePresence(session *SessionData) {
 	if err := discordClient.SetActivity(discord.Activity{
 		Details:   details,
 		State:     state,
-		LargeText: "Clawd Code - Discord Rich Presence for Claude Code",
+		LargeText: "Vibe Clauding - Discord Rich Presence for Claude Code",
 		StartTime: &session.StartTime,
 	}); err != nil {
 		fmt.Fprintf(os.Stderr, "Error updating presence: %v\n", err)

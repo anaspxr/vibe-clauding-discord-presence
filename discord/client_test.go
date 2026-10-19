@@ -144,7 +144,7 @@ func TestClient_SetActivity(t *testing.T) {
 				Details:    "Working on: myproject",
 				State:      "Opus 4.5 | 10K tokens | $0.50",
 				LargeImage: "logo",
-				LargeText:  "Clawd Code",
+				LargeText:  "Vibe Clauding",
 				SmallImage: "model",
 				SmallText:  "Claude Model",
 				StartTime:  timePtr(time.Date(2025, 1, 1, 12, 0, 0, 0, time.UTC)),

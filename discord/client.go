@@ -123,7 +123,16 @@ func (c *Client) SetActivity(activity Activity) error {
 		"nonce": fmt.Sprintf("%d", time.Now().UnixNano()),
 	}
 
-	return c.send(opFrame, payload)
+	if err := c.send(opFrame, payload); err != nil {
+		return err
+	}
+
+	// Discord answers every frame; an ERROR event means it rejected the activity.
+	resp, err := c.receive()
+	if err == nil && bytes.Contains(resp, []byte(`"evt":"ERROR"`)) {
+		return fmt.Errorf("discord rejected activity: %s", resp)
+	}
+	return nil
 }
 
 // Close disconnects from Discord

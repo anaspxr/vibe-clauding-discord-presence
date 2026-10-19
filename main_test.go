@@ -655,6 +655,7 @@ func TestReadSessionDataPriority(t *testing.T) {
 
 // TestPresenceText tests the activity lines Discord shows.
 func TestPresenceText(t *testing.T) {
+	configFilePath = filepath.Join(t.TempDir(), "missing.json")
 	details, state := presenceText(&SessionData{
 		ProjectName: "kadens",
 		GitBranch:   "main",
@@ -667,5 +668,18 @@ func TestPresenceText(t *testing.T) {
 	}
 	if state != "Opus 5.5 | 54.1K tokens | $1.2700" {
 		t.Errorf("state = %q", state)
+	}
+}
+
+// TestPresenceTextConfig tests that the JSON config overrides the lines.
+func TestPresenceTextConfig(t *testing.T) {
+	configFilePath = filepath.Join(t.TempDir(), "config.json")
+	cfg := `{"details": "Token-Maxing {project}", "state": "{model} | {tokens}"}`
+	if err := os.WriteFile(configFilePath, []byte(cfg), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	details, state := presenceText(&SessionData{ProjectName: "kadens", ModelName: "Opus 5.5", TotalTokens: 54112})
+	if details != "Token-Maxing kadens" || state != "Opus 5.5 | 54.1K" {
+		t.Errorf("got %q / %q", details, state)
 	}
 }
