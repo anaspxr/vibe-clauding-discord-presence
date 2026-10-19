@@ -10,7 +10,7 @@ $PidFile = Join-Path $ClaudeDir "discord-presence.pid"
 $LogFile = Join-Path $ClaudeDir "discord-presence.log"
 $RefcountFile = Join-Path $ClaudeDir "discord-presence.refcount"
 $Repo = "anaspxr/vibe-clauding-discord-presence"
-$Version = "v1.1.0"
+$Version = "v1.2.0"
 
 # Ensure directories exist
 New-Item -ItemType Directory -Path $ClaudeDir -Force | Out-Null

@@ -12,7 +12,7 @@ LOG_FILE="$CLAUDE_DIR/discord-presence.log"
 SESSIONS_DIR="$CLAUDE_DIR/discord-presence-sessions"
 REFCOUNT_FILE="$CLAUDE_DIR/discord-presence.refcount"
 REPO="anaspxr/vibe-clauding-discord-presence"
-VERSION="v1.1.0"
+VERSION="v1.2.0"
 
 # Detect platform
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')

@@ -7,10 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-20
+
 ### Added
 - `{window}` and `{percent}` placeholders: the model's context window and how much of it is used
 - `"large_text"` in the config file sets the third line Discord shows (the icon's hover text); `""` hides it
 - `"activity"` in the config file sets the activity type: `playing` (default), `listening`, `watching` or `competing`. Discord shows one activity per type, so `competing` keeps the presence visible next to other "Playing" apps such as VS Code extensions
+
+### Changed
+- New Discord application ID
 
 ### Fixed
 - Presence stayed on Discord after closing the Claude desktop app: the daemon now exits after 30 minutes with no session activity, and on Windows the start scripts reset a session count left high by sessions that ended without SessionEnd
@@ -106,7 +111,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automatic binary download on first run
 - GitHub Actions workflow for automated releases
 
-[Unreleased]: https://github.com/anaspxr/vibe-clauding-discord-presence/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/anaspxr/vibe-clauding-discord-presence/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/anaspxr/vibe-clauding-discord-presence/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/anaspxr/vibe-clauding-discord-presence/releases/tag/v1.1.0
 [1.0.6]: https://github.com/tsanva/cc-discord-presence/compare/v1.0.5...v1.0.6
 [1.0.5]: https://github.com/tsanva/cc-discord-presence/compare/v1.0.4...v1.0.5
