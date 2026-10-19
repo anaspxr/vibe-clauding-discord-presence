@@ -202,6 +202,8 @@ Both fields are optional. A field you leave out keeps the built-in text. Availab
 | `{tokens}`  | Context size, e.g. `54.1K`                             |
 | `{cost}`    | Session cost, e.g. `$1.2700`                           |
 
+Add `"activity"` to change the word Discord shows before the app name: `"playing"` (the default), `"listening"`, `"watching"` or `"competing"`. Discord shows only one activity of each kind, so another app that also shows "Playing" (a VS Code extension, a game) can hide this one; `"competing"` keeps them apart.
+
 The file is re-read every few seconds, so edits show up without restarting. If the file is missing or isn't valid JSON, the defaults are used. Discord cuts off long lines, so keep them short. [discord-presence-config.example.json](discord-presence-config.example.json) is a ready-to-copy example.
 
 ## Advanced: Custom Discord App

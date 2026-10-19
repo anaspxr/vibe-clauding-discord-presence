@@ -105,6 +105,7 @@ func TestClient_SetActivity(t *testing.T) {
 		wantAssets       bool
 		wantLargeImage   bool
 		wantLargeText    bool
+		wantType         interface{} // nil: no "type" key (Discord's default, Playing)
 	}{
 		{
 			name:        "Minimal activity - only details",
@@ -116,6 +117,12 @@ func TestClient_SetActivity(t *testing.T) {
 			activity:    Activity{Details: "Working", State: "In progress"},
 			wantDetails: true,
 			wantState:   true,
+		},
+		{
+			name:        "Competing activity",
+			activity:    Activity{Details: "Working", Type: 5},
+			wantDetails: true,
+			wantType:    float64(5),
 		},
 		{
 			name: "Activity with timestamp",
@@ -224,6 +231,10 @@ func TestClient_SetActivity(t *testing.T) {
 				if activity["details"] == nil {
 					t.Error("details should not be nil")
 				}
+			}
+
+			if activity["type"] != tt.wantType {
+				t.Errorf("type = %v, want %v", activity["type"], tt.wantType)
 			}
 
 			if tt.wantState {

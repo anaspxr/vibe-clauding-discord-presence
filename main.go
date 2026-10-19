@@ -506,9 +506,14 @@ func setSource(source string) {
 // optional; an empty one keeps the built-in text. Templates may use
 // {project} {branch} {model} {tokens} {cost}.
 type presenceConfig struct {
-	Details string `json:"details"`
-	State   string `json:"state"`
+	Details  string `json:"details"`
+	State    string `json:"state"`
+	Activity string `json:"activity"` // a key of activityTypes; "playing" otherwise
 }
+
+// activityTypes are the Discord activity types RPC accepts, by the word
+// Discord shows before the app name.
+var activityTypes = map[string]int{"playing": 0, "listening": 2, "watching": 3, "competing": 5}
 
 // loadConfig is read on every update, so edits apply without a restart.
 func loadConfig() presenceConfig {
@@ -551,11 +556,12 @@ func presenceText(session *SessionData) (details, state string) {
 
 func updatePresence(session *SessionData) {
 	details, state := presenceText(session)
+	activityType := activityTypes[strings.ToLower(loadConfig().Activity)]
 
 	// The data files change often (the hooks module writes after every tool
 	// call) and the poll runs every few seconds; only send what Discord
 	// would show differently.
-	key := details + "\n" + state + "\n" + session.StartTime.String()
+	key := fmt.Sprintf("%s\n%s\n%s\n%d", details, state, session.StartTime, activityType)
 	if key == lastPresence {
 		return
 	}
@@ -565,6 +571,7 @@ func updatePresence(session *SessionData) {
 		State:     state,
 		LargeText: "Vibe Clauding - Discord Rich Presence for Claude Code",
 		StartTime: &session.StartTime,
+		Type:      activityType,
 	}); err != nil {
 		fmt.Fprintf(os.Stderr, "Error updating presence: %v\n", err)
 		return

@@ -24,6 +24,8 @@ type Activity struct {
 	SmallImage string     `json:"small_image,omitempty"`
 	SmallText  string     `json:"small_text,omitempty"`
 	StartTime  *time.Time `json:"-"`
+	// 0 Playing, 2 Listening, 3 Watching, 5 Competing (the ones RPC accepts)
+	Type int `json:"-"`
 }
 
 // Conn interface for both unix sockets and windows pipes
@@ -106,6 +108,9 @@ func (c *Client) SetActivity(activity Activity) error {
 	}
 	if activity.State != "" {
 		activityData["state"] = activity.State
+	}
+	if activity.Type != 0 {
+		activityData["type"] = activity.Type
 	}
 	if len(assets) > 0 {
 		activityData["assets"] = assets

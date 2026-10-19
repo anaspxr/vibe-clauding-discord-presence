@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `"activity"` in the config file sets the activity type: `playing` (default), `listening`, `watching` or `competing`. Discord shows one activity per type, so `competing` keeps the presence visible next to other "Playing" apps such as VS Code extensions
+
 ### Fixed
 - Presence stayed on Discord after closing the Claude desktop app: the daemon now exits after 30 minutes with no session activity, and on Windows the start scripts reset a session count left high by sessions that ended without SessionEnd
 
