@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -24,6 +25,9 @@ const (
 
 	// Polling interval as fallback
 	PollInterval = 3 * time.Second
+
+	// Exit when no session data has been written for this long
+	IdleExit = 30 * time.Minute
 )
 
 // Model pricing per million tokens (December 2025)
@@ -100,6 +104,8 @@ var (
 	dataFilePath     string
 	moduleFilePath   string
 	configFilePath   string
+	pidFilePath      string
+	refcountFilePath string
 	sessionStartTime = time.Now()
 	discordClient    *discord.Client
 	currentSource    string
@@ -125,6 +131,8 @@ func init() {
 	dataFilePath = filepath.Join(claudeDir, "discord-presence-data.json")
 	moduleFilePath = filepath.Join(claudeDir, "discord-presence-module.json")
 	configFilePath = filepath.Join(claudeDir, "discord-presence-config.json")
+	pidFilePath = filepath.Join(claudeDir, "discord-presence.pid")
+	refcountFilePath = filepath.Join(claudeDir, "discord-presence.refcount")
 }
 
 func main() {
@@ -155,6 +163,8 @@ func main() {
 		os.Exit(0)
 	}()
 
+	go exitWhenIdle()
+
 	// Try initial read and show data source
 	if session := readSessionData(); session != nil {
 		updatePresence(session)
@@ -167,6 +177,41 @@ func main() {
 
 	// Start watching for changes
 	watchForChanges()
+}
+
+// exitWhenIdle stops the daemon once no session has written anything for
+// IdleExit. Closing the app kills its sessions without SessionEnd, so the stop
+// hook never runs; the next SessionStart starts a fresh daemon.
+func exitWhenIdle() {
+	for range time.Tick(time.Minute) {
+		if time.Since(lastActivity()) < IdleExit {
+			continue
+		}
+		fmt.Println("⏹ No Claude Code activity for a while, shutting down")
+		discordClient.Close()
+		// Only when the PID file is still ours, not a newer daemon's
+		if data, err := os.ReadFile(pidFilePath); err == nil && strings.TrimSpace(string(data)) == strconv.Itoa(os.Getpid()) {
+			os.Remove(pidFilePath)
+			os.Remove(refcountFilePath)
+		}
+		os.Exit(0)
+	}
+}
+
+// lastActivity is the newest write to any session data source, or the daemon's
+// start if that is later.
+func lastActivity() time.Time {
+	latest := sessionStartTime
+	paths := []string{moduleFilePath, dataFilePath}
+	if jsonl, _, err := findMostRecentJSONL(); err == nil {
+		paths = append(paths, jsonl)
+	}
+	for _, p := range paths {
+		if info, err := os.Stat(p); err == nil && info.ModTime().After(latest) {
+			latest = info.ModTime()
+		}
+	}
+	return latest
 }
 
 func readStatusLineData() *SessionData {

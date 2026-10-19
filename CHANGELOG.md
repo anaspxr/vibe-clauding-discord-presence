@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Presence stayed on Discord after closing the Claude desktop app: the daemon now exits after 30 minutes with no session activity, and on Windows the start scripts reset a session count left high by sessions that ended without SessionEnd
+
 ## [1.1.0] - 2026-10-19
 
 ### Fork notice

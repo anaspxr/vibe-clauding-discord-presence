@@ -18,7 +18,11 @@ New-Item -ItemType Directory -Path $BinDir -Force | Out-Null
 
 # Session tracking: Use refcount (PID-based tracking is unreliable on Windows)
 $CurrentCount = 0
-if (Test-Path $RefcountFile) {
+# Sessions killed without SessionEnd (closing the app) leave the count high;
+# it means nothing once the daemon is gone.
+$DaemonPid = if (Test-Path $PidFile) { Get-Content $PidFile -ErrorAction SilentlyContinue } else { $null }
+$DaemonAlive = $DaemonPid -and (Get-Process -Id $DaemonPid -ErrorAction SilentlyContinue | Where-Object { $_.ProcessName -like "cc-discord-presence*" })
+if ($DaemonAlive -and (Test-Path $RefcountFile)) {
     $CurrentCount = [int](Get-Content $RefcountFile -ErrorAction SilentlyContinue)
 }
 $ActiveSessions = $CurrentCount + 1

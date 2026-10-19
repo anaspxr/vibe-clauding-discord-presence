@@ -37,6 +37,12 @@ mkdir -p "$CLAUDE_DIR" "$BIN_DIR" "$SESSIONS_DIR"
 # Session tracking: Windows uses refcount (PPID unreliable), Unix uses PID files
 if $IS_WINDOWS; then
     CURRENT_COUNT=$(cat "$REFCOUNT_FILE" 2>/dev/null || echo "0")
+    # Sessions killed without SessionEnd (closing the app) leave the count
+    # high; it means nothing once the daemon is gone.
+    DAEMON_PID=$(cat "$PID_FILE" 2>/dev/null || true)
+    if [[ -z "$DAEMON_PID" ]] || ! process_exists "$DAEMON_PID"; then
+        CURRENT_COUNT=0
+    fi
     ACTIVE_SESSIONS=$((CURRENT_COUNT + 1))
     echo "$ACTIVE_SESSIONS" > "$REFCOUNT_FILE"
 else

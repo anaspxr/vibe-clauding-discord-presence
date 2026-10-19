@@ -576,6 +576,42 @@ func TestModelPricingConsistency(t *testing.T) {
 	}
 }
 
+// TestLastActivity tests that the newest data source write counts, and that a
+// daemon started after it waits from its own start.
+func TestLastActivity(t *testing.T) {
+	origData, origModule, origProjects, origStart := dataFilePath, moduleFilePath, projectsDir, sessionStartTime
+	defer func() {
+		dataFilePath, moduleFilePath, projectsDir, sessionStartTime = origData, origModule, origProjects, origStart
+	}()
+
+	tmpDir := t.TempDir()
+	dataFilePath = filepath.Join(tmpDir, "discord-presence-data.json")
+	moduleFilePath = filepath.Join(tmpDir, "discord-presence-module.json")
+	projectsDir = filepath.Join(tmpDir, "projects")
+	jsonl := filepath.Join(projectsDir, "-work-app", "s.jsonl")
+	os.MkdirAll(filepath.Dir(jsonl), 0755)
+
+	now := time.Now()
+	for path, age := range map[string]time.Duration{
+		moduleFilePath: 2 * time.Hour,
+		dataFilePath:   3 * time.Hour,
+		jsonl:          time.Hour,
+	} {
+		os.WriteFile(path, []byte("{}"), 0644)
+		os.Chtimes(path, now.Add(-age), now.Add(-age))
+	}
+
+	sessionStartTime = now.Add(-5 * time.Hour)
+	if got := time.Since(lastActivity()); got < 59*time.Minute || got > 61*time.Minute {
+		t.Errorf("lastActivity() was %v ago, want the JSONL's 1h", got)
+	}
+
+	sessionStartTime = now
+	if got := lastActivity(); !got.Equal(now) {
+		t.Errorf("lastActivity() = %v, want the daemon start %v", got, now)
+	}
+}
+
 // TestReadSessionDataPriority tests that the hooks module's file wins over the
 // statusline file, and that a blanked module file falls back to it.
 func TestReadSessionDataPriority(t *testing.T) {
