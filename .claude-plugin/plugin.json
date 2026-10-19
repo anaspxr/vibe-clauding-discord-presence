@@ -1,12 +1,12 @@
 {
-  "name": "cc-discord-presence",
-  "version": "1.0.6",
+  "name": "vibe-clauding-discord-presence",
+  "version": "1.1.0",
   "description": "Discord Rich Presence for Claude Code - Show your session on Discord",
   "author": {
-    "name": "tsanva",
-    "url": "https://github.com/tsanva"
+    "name": "anaspxr",
+    "url": "https://github.com/anaspxr"
   },
-  "repository": "https://github.com/tsanva/cc-discord-presence",
+  "repository": "https://github.com/anaspxr/vibe-clauding-discord-presence",
   "license": "MIT",
   "keywords": ["discord", "rich-presence", "rpc", "status"],
   "hooks": {
